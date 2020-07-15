@@ -1,6 +1,8 @@
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
 
+const { uuid } = require("uuidv4");
+
 class CreateTransactionService {
   private transactionsRepository: TransactionsRepository;
 
@@ -8,8 +10,15 @@ class CreateTransactionService {
     this.transactionsRepository = transactionsRepository;
   }
 
-  public execute(): Transaction {
-    // TODO
+  public execute(title : string, value: number, type: 'income'| 'outcome'): Transaction {
+    const balance  = this.transactionsRepository.getBalance();
+    if(type ==='outcome' && value > balance.total){
+      throw Error('transaction without a valid balance');
+    }
+    const transaction = this.transactionsRepository.create( {
+      id: uuid(),title, value, type
+    })
+    return transaction;
   }
 }
 
